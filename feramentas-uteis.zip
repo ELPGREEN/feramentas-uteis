@@ -1,0 +1,571 @@
+
+import os
+
+# Estrutura completa do repositório
+files = {}
+
+# ── README.md principal ──────────────────────────────────────────────────────
+files["README.md"] = '''# 🛠️ Ferramentas Úteis
+
+Coleção de scripts e ferramentas para desenvolvimento frontend, backend e DevOps.  
+Mantido por [@ELPGREEN](https://github.com/ELPGREEN).
+
+---
+
+## 📁 Estrutura
+
+```
+feramentas-uteis/
+├── frontend/
+│   ├── analyze-frontend.sh       # Análise estática completa de frontend
+│   └── README.md
+├── backend/
+│   ├── orion-vm-setup.sh         # Setup e diagnóstico da VM Orion (GCP)
+│   └── README.md
+├── ci-cd/
+│   ├── github-actions/
+│   │   └── frontend-analysis.yml # GitHub Actions — análise automática em PRs
+│   └── README.md
+├── scripts/
+│   ├── env-check.sh              # Verificação de variáveis de ambiente
+│   ├── deps-check.sh             # Saúde de dependências npm/pnpm/yarn
+│   └── README.md
+└── README.md                     ← você está aqui
+```
+
+---
+
+## ⚡ Início Rápido
+
+```bash
+# Clonar
+git clone https://github.com/ELPGREEN/feramentas-uteis.git
+cd feramentas-uteis
+
+# Dar permissão a todos os scripts
+chmod +x **/*.sh
+
+# Rodar análise frontend no seu projeto
+cp frontend/analyze-frontend.sh /seu-projeto/scripts/
+npm run analyze
+```
+
+---
+
+## 🔭 Frontend
+
+| Script | Descrição |
+|---|---|
+| [`analyze-frontend.sh`](./frontend/analyze-frontend.sh) | Análise estática completa: TypeScript, ESLint, Prettier, Stylelint, acessibilidade, segurança, performance, testes |
+
+→ [Ver documentação completa](./frontend/README.md)
+
+---
+
+## ⚙️ Backend
+
+| Script | Descrição |
+|---|---|
+| [`orion-vm-setup.sh`](./backend/orion-vm-setup.sh) | Diagnóstico e setup da VM Orion no GCP |
+
+→ [Ver documentação completa](./backend/README.md)
+
+---
+
+## 🚀 CI/CD
+
+| Arquivo | Descrição |
+|---|---|
+| [`frontend-analysis.yml`](./ci-cd/github-actions/frontend-analysis.yml) | GitHub Actions com score e comentário automático em PRs |
+
+→ [Ver documentação completa](./ci-cd/README.md)
+
+---
+
+## 🔧 Scripts Utilitários
+
+| Script | Descrição |
+|---|---|
+| [`env-check.sh`](./scripts/env-check.sh) | Verifica se todas as variáveis de ambiente necessárias estão definidas |
+| [`deps-check.sh`](./scripts/deps-check.sh) | Verifica saúde, vulnerabilidades e dependências desatualizadas |
+
+→ [Ver documentação completa](./scripts/README.md)
+
+---
+
+## 📋 Requisitos
+
+- Bash 4.0+
+- Node.js 18+
+- Python 3.8+ (para relatórios JSON)
+- `npm` / `pnpm` / `yarn` / `bun`
+
+---
+
+## 🤝 Contribuindo
+
+1. Fork o repositório
+2. Crie uma branch: `git checkout -b feat/nova-ferramenta`
+3. Commit: `git commit -m "feat: adiciona nova ferramenta"`
+4. Push: `git push origin feat/nova-ferramenta`
+5. Abra um Pull Request
+
+---
+
+## 📄 Licença
+
+MIT © [ELPGREEN](https://github.com/ELPGREEN)
+'''
+
+# ── frontend/README.md ────────────────────────────────────────────────────────
+files["frontend/README.md"] = '''# 🔭 Frontend Analyzer
+
+Análise estática completa para projetos frontend modernos.
+
+## Instalação
+
+```bash
+# Copiar para o seu projeto
+cp analyze-frontend.sh /seu-projeto/scripts/
+chmod +x /seu-projeto/scripts/analyze-frontend.sh
+```
+
+Adicione ao `package.json`:
+
+```json
+{
+  "scripts": {
+    "analyze":          "bash scripts/analyze-frontend.sh",
+    "analyze:strict":   "bash scripts/analyze-frontend.sh --strict",
+    "analyze:fix":      "bash scripts/analyze-frontend.sh --fix",
+    "analyze:ci":       "bash scripts/analyze-frontend.sh --strict --output report.json",
+    "analyze:full":     "bash scripts/analyze-frontend.sh --full",
+    "analyze:full:ci":  "bash scripts/analyze-frontend.sh --full --strict --output report.json"
+  }
+}
+```
+
+## Uso
+
+```bash
+npm run analyze             # análise básica
+npm run analyze:strict      # exit 1 em erros e warnings
+npm run analyze:fix         # autocorrige ESLint + Prettier
+npm run analyze:ci          # CI/CD → report.json
+npm run analyze:full        # + Knip, jscpd, Madge, secretlint
+```
+
+## Opções
+
+| Opção | Descrição |
+|---|---|
+| `--strict` | Exit 1 se houver erros ou warnings |
+| `--fix` | Autocorrige via ESLint/Prettier |
+| `--full` | Ativa knip, jscpd, madge, secretlint |
+| `--output <arquivo>` | Salva relatório em JSON |
+| `--browser <navegador>` | Verifica Browserslist |
+| `--quiet` | Mostra só o resumo |
+| `--no-color` | Sem cores (para logs de CI) |
+
+## Módulos de Verificação
+
+| # | Módulo | O que verifica |
+|---|---|---|
+| 1 | TypeScript | `tsc --noEmit` — erros de tipo |
+| 2 | ESLint | JS/TS/JSX — erros e warnings |
+| 3 | Prettier | Formatação de código |
+| 4 | Stylelint | CSS/SCSS/Modules |
+| 5 | Acessibilidade | `alt`, `aria-label`, `noopener`, labels |
+| 6 | Segurança | `npm audit`, secrets hardcoded, `eval()`, XSS |
+| 7 | Env vars | `.env` vs `.env.example`, `.gitignore` |
+| 8 | Dependências | Outdated, Browserslist, `.nvmrc` |
+| 9 | Qualidade | `console.log`, TODO, `any`, arquivos grandes |
+| 10 | Performance | Lazy loading, `useEffect` deps |
+| 11 | Testes | Cobertura estimada, E2E |
+| 12 | Full mode | Knip, jscpd, Madge, secretlint, Lighthouse CI |
+
+## Score
+
+| Score | Status |
+|---|---|
+| 90–100 | ✨ Frontend saudável |
+| 70–89 | ⚡ Bom, pequenos ajustes |
+| 50–69 | ⚠️ Revisão recomendada |
+| 0–49 | ✖ Correções obrigatórias |
+
+## Frameworks suportados
+
+Detecção automática de: **Next.js**, **Vite**, **Nuxt**, **Astro**, **SvelteKit**, **Remix**
+
+## Ferramentas extras (--full)
+
+Instale para usar o modo `--full`:
+
+```bash
+npm i -D knip jscpd madge @secretlint/secretlint
+```
+'''
+
+# ── backend/README.md ─────────────────────────────────────────────────────────
+files["backend/README.md"] = '''# ⚙️ Backend Tools
+
+Scripts para setup, diagnóstico e manutenção de servidores backend.
+
+## orion-vm-setup.sh
+
+Diagnóstico completo da VM Orion no Google Cloud Platform.
+
+### O que verifica
+
+- Status do serviço systemd (`orion.service`)
+- Variáveis de ambiente injetadas
+- Endpoints FastAPI (health, proxy/gemini, embeddings, tts, stt)
+- Uso de memória e CPU
+- Configuração dos drop-ins do systemd
+- Secrets e tokens órfãos
+
+### Uso
+
+```bash
+chmod +x orion-vm-setup.sh
+./orion-vm-setup.sh
+```
+
+### Requisitos
+
+- Ubuntu 22.04+ / Debian
+- Python 3.10+
+- systemd
+- curl, jq
+'''
+
+# ── ci-cd/README.md ───────────────────────────────────────────────────────────
+files["ci-cd/README.md"] = '''# 🚀 CI/CD
+
+Workflows prontos para GitHub Actions.
+
+## frontend-analysis.yml
+
+Roda o `analyze-frontend.sh` automaticamente em todo push e pull request.
+
+### Funcionalidades
+
+- ✅ Análise completa em modo `--strict`
+- ✅ Gera `report.json` como artefato
+- ✅ Comenta automaticamente no PR com o score
+- ✅ Bloqueia merge se score crítico
+
+### Instalação
+
+```bash
+mkdir -p .github/workflows
+cp frontend-analysis.yml .github/workflows/
+```
+
+### Exemplo de comentário no PR
+
+```
+## ✨ Frontend Analysis — Score: 94/100
+
+|                  | Resultado |
+|---|---|
+| 🔴 Erros críticos | 0 |
+| 🟡 Avisos         | 2 |
+| 🔵 Sugestões      | 3 |
+| ⏱ Tempo          | 12s |
+| 🧩 Framework      | Next.js |
+
+> ✅ Pronto para merge.
+```
+'''
+
+# ── scripts/README.md ─────────────────────────────────────────────────────────
+files["scripts/README.md"] = '''# 🔧 Scripts Utilitários
+
+Scripts standalone para tarefas comuns de desenvolvimento.
+
+## env-check.sh
+
+Verifica se todas as variáveis de ambiente necessárias estão definidas.
+
+```bash
+# Uso básico
+./env-check.sh
+
+# Com arquivo de referência customizado
+./env-check.sh --ref .env.production.example
+
+# Modo strict (exit 1 se faltar alguma)
+./env-check.sh --strict
+```
+
+## deps-check.sh
+
+Verifica saúde das dependências npm/pnpm/yarn/bun.
+
+```bash
+# Verificar vulnerabilidades + outdated
+./deps-check.sh
+
+# Só vulnerabilidades
+./deps-check.sh --audit-only
+
+# Só dependências desatualizadas
+./deps-check.sh --outdated-only
+```
+'''
+
+# ── scripts/env-check.sh ─────────────────────────────────────────────────────
+files["scripts/env-check.sh"] = '''#!/usr/bin/env bash
+# env-check.sh — Verifica variáveis de ambiente obrigatórias
+# Uso: ./env-check.sh [--ref <arquivo>] [--strict]
+
+set -euo pipefail
+RED=\'\\033[0;31m\'; GREEN=\'\\033[0;32m\'; YELLOW=\'\\033[1;33m\'; RESET=\'\\033[0m\'
+STRICT=false; REF_FILE=".env.example"
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --strict) STRICT=true ;;
+    --ref)    REF_FILE="$2"; shift ;;
+  esac
+  shift
+done
+
+ERRORS=0
+echo -e "\\n🔍 Verificando variáveis de ambiente..."
+echo -e "   Referência: ${REF_FILE}\\n"
+
+if [[ ! -f "$REF_FILE" ]]; then
+  echo -e "${YELLOW}⚠  ${REF_FILE} não encontrado — nada a verificar${RESET}"
+  exit 0
+fi
+
+ENV_FILE=".env"
+[[ ! -f "$ENV_FILE" ]] && ENV_FILE=".env.local"
+[[ ! -f "$ENV_FILE" ]] && { echo -e "${RED}✖ Nenhum .env encontrado${RESET}"; exit 1; }
+
+while IFS= read -r line; do
+  [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
+  VAR=$(echo "$line" | cut -d= -f1)
+  if grep -q "^${VAR}=" "$ENV_FILE" 2>/dev/null; then
+    VAL=$(grep "^${VAR}=" "$ENV_FILE" | cut -d= -f2-)
+    [[ -z "$VAL" ]] && echo -e "${YELLOW}⚠  $VAR está vazia${RESET}" \
+                    || echo -e "${GREEN}✔  $VAR${RESET}"
+  else
+    echo -e "${RED}✖  $VAR não encontrada em ${ENV_FILE}${RESET}"
+    ERRORS=$((ERRORS+1))
+  fi
+done < "$REF_FILE"
+
+echo ""
+[[ $ERRORS -gt 0 ]] && echo -e "${RED}$ERRORS variável(is) ausente(s)${RESET}" \
+                     || echo -e "${GREEN}✨ Todas as variáveis presentes${RESET}"
+
+[[ "$STRICT" == true && $ERRORS -gt 0 ]] && exit 1
+exit 0
+'''
+
+# ── scripts/deps-check.sh ────────────────────────────────────────────────────
+files["scripts/deps-check.sh"] = '''#!/usr/bin/env bash
+# deps-check.sh — Saúde das dependências npm/pnpm/yarn/bun
+# Uso: ./deps-check.sh [--audit-only] [--outdated-only]
+
+set -euo pipefail
+RED=\'\\033[0;31m\'; GREEN=\'\\033[0;32m\'; YELLOW=\'\\033[1;33m\'
+BLUE=\'\\033[0;34m\'; BOLD=\'\\033[1m\'; RESET=\'\\033[0m\'
+
+AUDIT_ONLY=false; OUTDATED_ONLY=false
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --audit-only)    AUDIT_ONLY=true ;;
+    --outdated-only) OUTDATED_ONLY=true ;;
+  esac
+  shift
+done
+
+PM="npm"
+[[ -f "yarn.lock" ]]      && PM="yarn"
+[[ -f "pnpm-lock.yaml" ]] && PM="pnpm"
+[[ -f "bun.lockb" ]]      && PM="bun"
+
+echo -e "\\n${BOLD}🔍 Verificando dependências (${PM})...${RESET}\\n"
+
+if [[ "$OUTDATED_ONLY" == false ]]; then
+  echo -e "${BOLD}━━━ Vulnerabilidades${RESET}"
+  if [[ "$PM" == "npm" ]]; then
+    AUDIT=$(npm audit --json 2>/dev/null || echo "{}")
+    C=$(echo "$AUDIT" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get(\'metadata\',{}).get(\'vulnerabilities\',{}).get(\'critical\',0))" 2>/dev/null || echo 0)
+    H=$(echo "$AUDIT" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get(\'metadata\',{}).get(\'vulnerabilities\',{}).get(\'high\',0))" 2>/dev/null || echo 0)
+    [[ $C -gt 0 ]] && echo -e "${RED}  ✖ $C crítica(s)${RESET}" || true
+    [[ $H -gt 0 ]] && echo -e "${YELLOW}  ⚠ $H high${RESET}" || true
+    [[ $C -eq 0 && $H -eq 0 ]] && echo -e "${GREEN}  ✔ Sem vulnerabilidades críticas/high${RESET}"
+  elif [[ "$PM" == "pnpm" ]]; then
+    pnpm audit 2>/dev/null || true
+  fi
+fi
+
+if [[ "$AUDIT_ONLY" == false ]]; then
+  echo -e "\\n${BOLD}━━━ Dependências Desatualizadas${RESET}"
+  if [[ "$PM" == "npm" ]]; then
+    OUTDATED=$(npm outdated 2>/dev/null || true)
+    [[ -n "$OUTDATED" ]] && echo "$OUTDATED" || echo -e "${GREEN}  ✔ Tudo atualizado${RESET}"
+  elif [[ "$PM" == "pnpm" ]]; then
+    pnpm outdated 2>/dev/null || echo -e "${GREEN}  ✔ Tudo atualizado${RESET}"
+  fi
+fi
+
+echo ""
+'''
+
+# ── ci-cd/github-actions/frontend-analysis.yml ───────────────────────────────
+files["ci-cd/github-actions/frontend-analysis.yml"] = '''name: 🔭 Frontend Analysis
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  analyze:
+    name: Analyze Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: \'20\'
+          cache: \'npm\'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Make script executable
+        run: chmod +x scripts/analyze-frontend.sh
+
+      - name: Run Frontend Analysis
+        run: npm run analyze:ci
+
+      - name: Upload Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-analysis-report
+          path: report.json
+          retention-days: 30
+
+      - name: Comment PR
+        if: github.event_name == \'pull_request\' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require(\'fs\');
+            if (!fs.existsSync(\'report.json\')) return;
+            const r = JSON.parse(fs.readFileSync(\'report.json\', \'utf8\'));
+            const e = r.score >= 90 ? \'✨\' : r.score >= 70 ? \'⚡\' : \'⚠️\';
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ${e} Frontend Analysis — Score: ${r.score}/100\\n\\n| | Resultado |\\n|---|---|\\n| 🔴 Erros | ${r.summary.errors} |\\n| 🟡 Avisos | ${r.summary.warnings} |\\n| 🔵 Sugestões | ${r.summary.suggestions} |\\n| ⏱ Tempo | ${r.summary.elapsed_seconds}s |\\n| 🧩 Framework | ${r.framework} |\\n\\n${r.summary.errors > 0 ? \'> ❌ Corrija os erros antes do merge.\' : \'> ✅ Pronto para merge.\'}`
+            });
+'''
+
+# ── backend/orion-vm-setup.sh ─────────────────────────────────────────────────
+files["backend/orion-vm-setup.sh"] = '''#!/usr/bin/env bash
+# orion-vm-setup.sh — Diagnóstico da VM Orion (GCP / FastAPI)
+# Uso: ./orion-vm-setup.sh
+
+set -euo pipefail
+RED=\'\\033[0;31m\'; GREEN=\'\\033[0;32m\'; YELLOW=\'\\033[1;33m\'
+CYAN=\'\\033[0;36m\'; BOLD=\'\\033[1m\'; DIM=\'\\033[2m\'; RESET=\'\\033[0m\'
+
+ok()      { echo -e "${GREEN}  ✔${RESET} $1"; }
+warn()    { echo -e "${YELLOW}  ⚠${RESET} $1"; }
+err()     { echo -e "${RED}  ✖${RESET} $1"; }
+section() { echo -e "\\n${BOLD}${CYAN}━━━ $1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"; }
+
+echo -e "${BOLD}╔══════════════════════════════════════════╗${RESET}"
+echo -e "${BOLD}║     ⚙️  Orion VM Diagnostics             ║${RESET}"
+echo -e "${BOLD}╚══════════════════════════════════════════╝${RESET}"
+
+section "1. Serviço systemd"
+systemctl is-active orion &>/dev/null && ok "orion.service ATIVO" || err "orion.service INATIVO"
+systemctl is-enabled orion &>/dev/null && ok "Habilitado no boot" || warn "Não habilitado no boot"
+
+section "2. Variáveis de Ambiente"
+ENV_OUTPUT=$(sudo systemctl show orion --property=Environment 2>/dev/null || true)
+echo "$ENV_OUTPUT" | grep -oP \'[A-Z_]+=\\S+\' | while IFS= read -r var; do
+  KEY=$(echo "$var" | cut -d= -f1)
+  [[ ${#KEY} -gt 0 ]] && ok "$KEY definida" || warn "$KEY vazia"
+done
+
+section "3. Endpoints FastAPI"
+BASE="http://localhost:8080"
+for EP in "health" "docs"; do
+  CODE=$(curl -s -o /dev/null -w "%{http_code}" "${BASE}/${EP}" 2>/dev/null || echo "000")
+  [[ "$CODE" == "200" ]] && ok "/${EP} → ${CODE}" || err "/${EP} → ${CODE}"
+done
+
+section "4. Memória"
+MEM=$(curl -s "${BASE}/health" 2>/dev/null | python3 -c \
+  "import json,sys; d=json.load(sys.stdin); \
+   used=d[\'memory_used_mb\']; total=d[\'memory_total_mb\']; \
+   pct=round(used/total*100); \
+   print(f\'{used}MB / {total}MB ({pct}%)\' )" 2>/dev/null || echo "N/A")
+echo -e "  ${DIM}RAM: $MEM${RESET}"
+
+section "5. Drop-ins systemd"
+ls /etc/systemd/system/orion.service.d/ 2>/dev/null | while IFS= read -r f; do
+  [[ "$f" == *.disabled ]] && warn "$f (desativado)" || ok "$f ativo"
+done
+
+section "6. .env"
+ENV_PATH="/home/$(logname)/orion-vm-bundle/.env"
+[[ -f "$ENV_PATH" ]] && ok ".env encontrado: $ENV_PATH" || err ".env não encontrado"
+grep -q "^\.env" "${ENV_PATH%/*}/.gitignore" 2>/dev/null && \
+  ok ".env no .gitignore" || warn ".env não está no .gitignore"
+
+echo -e "\\n${GREEN}${BOLD}✨ Diagnóstico concluído.${RESET}\\n"
+'''
+
+# ── .gitignore ────────────────────────────────────────────────────────────────
+files[".gitignore"] = '''.env
+.env.local
+.env.*.local
+node_modules/
+*.log
+report.json
+dist/
+build/
+.DS_Store
+'''
+
+# ── LICENSE ───────────────────────────────────────────────────────────────────
+files["LICENSE"] = '''MIT License
+
+Copyright (c) 2026 ELPGREEN
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+'''
+
+print(f"Total de arquivos: {len(files)}")
+for path in sorted(files.keys()):
+    print(f"  {path} ({len(files[path])} chars)")

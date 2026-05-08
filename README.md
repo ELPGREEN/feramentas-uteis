@@ -1,4 +1,4 @@
-Aqui estão as melhores ferramentas para complementar o `analyze-frontend.sh`:
+ferramentas para complementar o `analyze-frontend.sh`:
 
 ***
 

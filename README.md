@@ -54,16 +54,7 @@ chmod +x **/*.sh
 |---|---|
 | [`env-check.sh`](./scripts/env-check.sh) | Verifica variáveis de ambiente |
 | [`deps-check.sh`](./scripts/deps-check.sh) | Saúde de dependências npm |
-# ─── 1. BAIXAR ─────────────────────────────────────────────────────────────
-# Na raiz do projeto frontend, crie a pasta e baixe o script
-mkdir -p scripts
 
-curl -fsSL https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPO/main/scripts/analyze-frontend.sh \
-  -o scripts/analyze-frontend.sh
-
-# Se não tiver o script no GitHub ainda, crie direto:
-# (cole o conteúdo do analyze-frontend.sh no arquivo abaixo)
-nano scripts/analyze-frontend.sh   # ou code scripts/analyze-frontend.sh
 
 # ─── 2. PERMISSÃO ─────────────────────────────────────────────────────────
 chmod +x scripts/analyze-frontend.sh

@@ -1,4 +1,4 @@
-text
+
 # 🛠️ Ferramentas Úteis
 
 Coleção de scripts e ferramentas para desenvolvimento frontend, backend e DevOps.  
